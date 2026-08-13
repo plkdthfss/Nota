@@ -1,0 +1,57 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+    width: 100%;
+    height: 100%;
+}
+
+html {
+    background: var(--color-bg-page);
+}
+
+body {
+    margin: 0;
+    min-width: 320px;
+    overflow: hidden;
+    color: var(--color-text-primary);
+    background: var(--color-bg-page);
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    color: inherit;
+}
+
+button:focus-visible,
+input:focus-visible {
+    outline: 2px solid var(--color-action-accent);
+    outline-offset: 2px;
+}
+
+button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 99px;
+    background: #d4d4d8;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}

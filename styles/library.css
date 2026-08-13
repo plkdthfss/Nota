@@ -1,0 +1,333 @@
+.library-shell {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 320px;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--color-bg-page);
+}
+
+.app-header {
+    flex: 0 0 52px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 52px;
+    gap: 8px;
+    padding: 0 12px 0 16px;
+    border-bottom: 1px solid var(--color-border-default);
+    background: var(--color-bg-surface);
+}
+
+.app-mark {
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-sm);
+    background: var(--color-action-accent);
+}
+
+.app-title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    color: var(--color-text-primary);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 22px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.header-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.icon-button {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    background: transparent;
+    cursor: pointer;
+}
+
+.icon-button:hover {
+    background: var(--color-bg-subtle);
+}
+
+.icon-button--small {
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-xs);
+}
+
+.search-section,
+.folder-section,
+.result-header {
+    padding-right: 16px;
+    padding-left: 16px;
+}
+
+.search-section {
+    flex: 0 0 auto;
+    margin-top: 12px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 36px;
+    padding: 0 9px;
+    gap: 8px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    background: var(--color-bg-surface);
+}
+
+.search-box:focus-within {
+    border-color: var(--color-action-accent);
+    box-shadow: 0 0 0 2px rgba(99, 91, 255, .1);
+}
+
+.search-input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    color: var(--color-text-primary);
+    background: transparent;
+    line-height: 22px;
+}
+
+.search-input::placeholder {
+    color: var(--color-text-secondary);
+}
+
+.folder-section {
+    flex: 0 0 auto;
+    margin-top: 12px;
+}
+
+.section-label {
+    margin: 0 0 4px;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+}
+
+.folder-list {
+    display: grid;
+    gap: 2px;
+}
+
+.folder-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 34px;
+    padding: 0 8px;
+    gap: 8px;
+    border: 0;
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+}
+
+.folder-row:hover {
+    background: var(--color-bg-subtle);
+}
+
+.folder-row[aria-current="true"] {
+    color: var(--color-text-primary);
+    background: var(--color-action-accent-muted);
+}
+
+.folder-row[aria-current="true"] .folder-icon {
+    color: var(--color-action-accent);
+}
+
+.folder-chevron {
+    flex: 0 0 14px;
+}
+
+.folder-icon {
+    flex: 0 0 16px;
+}
+
+.folder-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.folder-count {
+    flex: 0 0 auto;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.result-header {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.note-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    align-content: start;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 0 16px 72px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.note-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    min-height: 92px;
+    padding: 11px 12px;
+    gap: 6px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-card);
+    color: var(--color-text-primary);
+    background: var(--color-bg-surface);
+    cursor: pointer;
+    text-align: left;
+}
+
+.note-card:hover {
+    border-color: #d4d4d8;
+    background: #fafafa;
+}
+
+.note-card[aria-pressed="true"] {
+    border-color: var(--color-action-accent);
+    background: var(--color-action-accent-muted);
+}
+
+.note-title-row,
+.note-meta {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.note-title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.note-excerpt {
+    margin: 0;
+    overflow: hidden;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.note-meta {
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.note-folder {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.note-time {
+    flex: 0 0 auto;
+}
+
+.fab {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-lg);
+    color: white;
+    background: var(--color-action-accent);
+    box-shadow: var(--shadow-fab);
+    cursor: pointer;
+    transition: transform 100ms ease, background-color 100ms ease, box-shadow 100ms ease;
+}
+
+.fab:hover {
+    background: #554df0;
+    box-shadow: 0 7px 18px rgba(26, 26, 31, .24);
+}
+
+.fab:active {
+    transform: scale(.97);
+}
+
+@media (max-width: 359px) {
+    .app-header {
+        padding-left: 12px;
+    }
+
+    .search-section,
+    .folder-section,
+    .result-header {
+        padding-right: 12px;
+        padding-left: 12px;
+    }
+
+    .note-list {
+        padding-right: 12px;
+        padding-left: 12px;
+    }
+
+    .fab {
+        right: 12px;
+    }
+}
