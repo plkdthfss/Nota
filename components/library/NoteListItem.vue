@@ -1,16 +1,11 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
-import { Download, MoreHorizontal, Trash2, X } from "@lucide/vue";
+import { MoreHorizontal, Trash2, X } from "@lucide/vue";
 import type { NoteListItem } from "../../types/library";
 import IconButton from "../common/IconButton.vue";
 
 const props = defineProps<{ note: NoteListItem }>();
-const emit = defineEmits<{
-  select: [id: string];
-  delete: [id: string];
-  /** 导出为 Markdown 文件 */
-  exportMd: [id: string];
-}>();
+const emit = defineEmits<{ select: [id: string]; delete: [id: string] }>();
 
 const menuOpen = ref(false);
 const mode = ref<"menu" | "confirm">("menu");
@@ -42,11 +37,6 @@ function closeMenu() {
 function confirmDelete() {
   closeMenu();
   emit("delete", props.note.id);
-}
-
-function exportMarkdown() {
-  closeMenu();
-  emit("exportMd", props.note.id);
 }
 
 /** 点击弹层外部关闭（与编辑器弹层交互一致） */
@@ -105,15 +95,6 @@ onBeforeUnmount(() => {
             >
               <Trash2 :size="14" aria-hidden="true" />
               <span>Delete</span>
-            </button>
-            <button
-              type="button"
-              class="note-menu-item"
-              role="menuitem"
-              @click="exportMarkdown"
-            >
-              <Download :size="14" aria-hidden="true" />
-              <span>Export markdown</span>
             </button>
           </template>
           <div v-else class="note-menu-confirm">

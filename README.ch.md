@@ -1,175 +1,173 @@
-# SideNote — Chrome Side Panel Notes Extension
+# SideNote — Chrome 侧边栏笔记插件
 
 <p align="center">
-  <a href="./README.md">简体中文</a> | <b>English</b>
+  <a href="./README.md">English</a> | <b>简体中文</b>
 </p>
 
-A note-taking extension for the Chrome **Side Panel**, built with **WXT + Vue 3 + Tiptap**. Click the extension icon to take notes, organize folders, and search full text right in the browser sidebar. All data is stored locally in `chrome.storage.local` — no server, fully offline.
+一个基于 **Vue 3 + Tiptap** 的 Chrome 侧边栏（Side Panel）笔记应用：点击扩展图标即可在浏览器侧边栏中快速记笔记、整理文件夹、全文搜索，数据全部存储在本地（`chrome.storage.local`），无需服务器、离线可用。
 
-## ✨ Features
+## ✨ 功能特性
 
-- **Note library**: folder management, note list (filtered by folder), full-library search (title/excerpt + full-text scan)
-- **Rich-text editor**: built on Tiptap — headings (H1–H3), bold/italic, ordered/unordered/task lists, blockquotes, inline code/code blocks, links, horizontal rules, undo/redo; Markdown-compatible documents under the hood
-- **Auto-save**: 800ms debounced writes merged into one, forced flush before navigating back / panel hide — no lost keystrokes
-- **Note management**: create in the current folder, delete (with confirmation), **export as a standalone `.md` file** (Save As dialog)
-- **Folder management**: create; on delete choose the **cascade policy** — move notes to any existing folder, or delete notes along with the folder (empty folders delete directly without confirmation)
-- **Light / dark theme**: one-click toggle, the editor switches in sync, preference persisted locally
-- **Local-first data**: everything stored in `chrome.storage.local` (`unlimitedStorage` granted), no accounts, no cloud sync, privacy-friendly
+- **笔记库**：文件夹管理、笔记列表（按文件夹筛选）、全库搜索（标题/摘要 + 正文扫描）
+- **富文本编辑器**：基于 Tiptap，支持标题（H1–H3）、加粗/斜体、有序/无序/任务列表、引用、行内代码/代码块、链接、分割线、撤销/重做；底层为 Markdown 兼容文档
+- **自动保存**：800ms 防抖合并写入，返回列表 / 侧边栏隐藏前强制落盘，关闭面板不丢字
+- **笔记管理**：在当前文件夹新建、删除（二次确认）、**导出为独立 `.md` 文件**（弹出另存为对话框）
+- **文件夹管理**：新建；删除时可选**级联策略**——把笔记移入指定现有文件夹，或连同笔记一起删除（空文件夹直接删除，不弹确认）
+- **明暗主题**：一键切换亮/暗模式，编辑器同步变色，选择持久化到本地
+- **数据本地化**：全部笔记存于 `chrome.storage.local`（申请 `unlimitedStorage` 解除配额），无账号、无云同步、隐私友好
 
-## 🧱 Tech Stack
+## 🧱 技术栈
 
-| Layer | Choice |
+| 层 | 选型 |
 | --- | --- |
-| Extension framework | [WXT](https://wxt.dev) 0.20 (Chrome MV3) + Vite |
-| UI | Vue 3.5 (`<script setup lang="ts">`, TS strict) + [@lucide/vue](https://lucide.dev) icons |
-| Editor | [Tiptap](https://tiptap.dev) 3.27 (starter-kit / link / task-list / character-count / markdown) |
-| Storage | `chrome.storage.local` (no local database) |
-| State management | Centralized in the `App.vue` container (Pinia installed, reserved for future) |
+| 扩展框架 | [WXT](https://wxt.dev) 0.20（Chrome MV3）+ Vite |
+| UI | Vue 3.5（`<script setup lang="ts">`，TS strict）+ [@lucide/vue](https://lucide.dev) 图标 |
+| 编辑器 | [Tiptap](https://tiptap.dev) 3.27（starter-kit / link / task-list / character-count / markdown） |
+| 存储 | `chrome.storage.local`（无本地数据库） |
+| 状态管理 | 目前收敛在 `App.vue` 单一容器（Pinia 已安装，预留） |
 
-## 📁 Project Structure
+## 📁 目录结构
 
 ```
-├── entrypoints/               # WXT extension entries
-│   ├── background.ts          # Side panel behavior (open on icon click)
-│   ├── content.ts             # Content script (placeholder, matches google.com)
-│   └── sidepanel/             # Side panel UI (Vue app)
-│       ├── main.ts            # App mounting
-│       └── App.vue            # Single state container (library ↔ editor flow)
+├── entrypoints/               # WXT 扩展入口
+│   ├── background.ts          # 侧边栏行为配置（点击图标打开）
+│   ├── content.ts             # 内容脚本（占位，匹配 google.com）
+│   └── sidepanel/             # 侧边栏 UI（Vue 应用）
+│       ├── main.ts            # 应用挂载
+│       └── App.vue            # 唯一状态容器（library ↔ editor 页面流）
 ├── components/
-│   ├── library/               # Library components (header/search/folders/list/create)
-│   ├── editor/                # Editor components (toolbars/bubble menu/link popover/status bar)
-│   └── common/                # Shared components (IconButton, etc.)
+│   ├── library/               # 笔记库组件（头部/搜索/文件夹/列表/新建）
+│   ├── editor/                # 编辑器组件（工具栏/气泡菜单/链接弹层/状态栏）
+│   └── common/                # IconButton 等通用组件
 ├── composables/
-│   └── useTiptapEditor.ts     # Editor instance + word count
-├── services/                  # Data service layer (reads/writes chrome.storage.local)
-│   ├── storage.ts             # Storage adapter (debounced writes/batch reads/error mapping)
-│   ├── noteService.ts         # Note CRUD / index maintenance / idempotent init
-│   ├── folderService.ts       # Folder CRUD / delete cascade
-│   ├── searchService.ts       # Title/excerpt + batched full-text scan
-│   ├── settingsService.ts     # Settings (default folder / theme)
-│   └── markdownService.ts     # Tiptap HTML ↔ Markdown conversion
-├── types/                     # Domain types + storage models + message protocol
-│   ├── library.ts             # Frontend view types (Folder / NoteListItem)
-│   ├── editor.ts              # Editor types (SidePanelPage, etc.)
-│   └── storage.ts             # Persistence models (Meta / Folder / Note index)
-├── styles/                    # Design tokens + global styles (token-driven themes)
-│   ├── tokens.css             # Design tokens (light/dark CSS variables)
+│   └── useTiptapEditor.ts     # 编辑器实例 + 字数统计
+├── services/                  # 数据服务层（直接读写 chrome.storage.local）
+│   ├── storage.ts             # 存储适配层（防抖写/批量读/错误归一）
+│   ├── noteService.ts         # 笔记 CRUD / 索引维护 / 幂等初始化
+│   ├── folderService.ts       # 文件夹 CRUD / 删除级联
+│   ├── searchService.ts       # 标题/摘要 + 正文批量扫描搜索
+│   ├── settingsService.ts     # 设置（默认文件夹 / 主题）
+│   └── markdownService.ts     # Tiptap HTML ↔ Markdown 转换
+├── types/                     # 领域类型 + 存储模型 + 消息协议
+│   ├── library.ts             # 前端视图类型（Folder / NoteListItem）
+│   ├── editor.ts              # 编辑器类型（SidePanelPage 等）
+│   └── storage.ts             # 持久化模型（Meta / Folder / Note 索引）
+├── styles/                    # 设计令牌 + 全局样式（token 驱动明暗主题）
+│   ├── tokens.css             # 设计令牌（亮/暗两套 CSS 变量）
 │   ├── base.css / library.css / editor.css
-├── mock/                      # Mock data from the early UI prototype (deprecated, removable)
-├── docs/                      # Design & API documentation (in Chinese)
-│   ├── frontend-api.md        # Frontend API docs (component Props/Emits)
-│   ├── backend-design.md      # Backend (data service layer) design
-│   └── backend-design-review.md  # Design self-review & risk list
-└── wxt.config.ts              # WXT config (manifest / permissions)
+├── mock/                      # 早期 UI 原型期的 mock 数据（已弃用，可删除）
+├── docs/                      # 设计与接口文档
+│   ├── frontend-api.md        # 前端接口文档（组件 Props/Emits）
+│   ├── backend-design.md      # 后端（数据服务层）设计方案
+│   └── backend-design-review.md  # 设计自评与风险清单
+└── wxt.config.ts              # WXT 配置（manifest / 权限）
 ```
 
-## 🚀 Quick Start
+## 🚀 快速开始
 
-Requirements: Node.js 18+, Chrome browser (114+ recommended).
+要求：Node.js 18+，Chrome 浏览器（推荐 114+）。
 
 ```bash
-# 1. Install dependencies (postinstall runs `wxt prepare` automatically)
+# 1. 安装依赖（postinstall 会自动执行 wxt prepare）
 npm install
 
-# 2. Dev mode: opens Chrome with the extension loaded, hot reload
+# 2. 开发模式：自动打开 Chrome 并加载扩展，代码热更新
 npm run dev
 
-# 3. Production build: output to .output/chrome-mv3
+# 3. 生产构建：产物输出到 .output/chrome-mv3
 npm run build
 ```
 
-**Load the built extension manually**:
+**手动加载构建产物**：
 
-1. Open `chrome://extensions` and enable "Developer mode" (top-right)
-2. Click "Load unpacked" and select `项目目录/.output/chrome-mv3`
-3. Click the extension icon in the toolbar to open the SideNote side panel
+1. 打开 `chrome://extensions`，开启右上角「开发者模式」
+2. 点击「加载已解压的扩展程序」，选择 `项目目录/.output/chrome-mv3`
+3. 点击工具栏中的扩展图标，侧边栏即打开 SideNote
 
-**Package for publishing**:
+**打包发布**：
 
 ```bash
-npm run zip        # generates a zip for the Chrome Web Store (.output/*.zip)
+npm run zip        # 生成可上架 Chrome 商店的 zip（.output/*.zip）
 ```
 
-## 🎯 Usage
+## 🎯 使用说明
 
-| Entry | Function |
+| 入口 | 功能 |
 | --- | --- |
-| Extension icon | Open / close the side panel |
-| Search box | Full-library search (includes body); empty shows current folder notes |
-| Folder list | Click to filter notes of that folder; row-end ⋮ → delete folder |
-| ＋ button (bottom-right) | Upward menu: new note (current folder) / new folder |
-| Note card ⋮ | Delete (with confirmation) / Export markdown (.md file) |
-| Editor top | Back to library, fixed toolbar (headings/bold/lists/quote/link/more) |
-| Selected text | Floating bubble toolbar (bold/italic/link/inline code/quote) |
-| ☀/🌙 (top-right) | Toggle light/dark theme |
+| 扩展图标 | 打开/关闭侧边栏 |
+| 搜索框 | 全库搜索（含正文），空则显示当前文件夹笔记 |
+| 文件夹列表 | 点击筛选该文件夹笔记；行尾 ⋮ → 删除文件夹 |
+| 右下角 ＋ | 上拉菜单：新建笔记（当前文件夹）/ 新建文件夹 |
+| 笔记卡片 ⋮ | Delete（二次确认）/ Export markdown（导出 .md 文件） |
+| 编辑器顶部 | 返回列表、固定工具栏（标题/加粗/列表/引用/链接/更多） |
+| 选中文本 | 浮动气泡工具栏（加粗/斜体/链接/行内代码/引用） |
+| 右上角 ☀/🌙 | 一键切换明暗主题 |
 
-## 💾 Data & Permissions
+## 💾 数据与权限
 
-All data lives in `chrome.storage.local`:
+所有数据存放在 `chrome.storage.local`，Key 布局：
 
 ```
-meta           —— schema version + settings (default folder / theme)
-folders        —— folder table
-notes:index    —— lightweight note index (lists/search, no body)
-note:{id}      —— full note body (Tiptap HTML)
+meta           —— schema 版本 + 设置（默认文件夹 / 主题）
+folders        —— 文件夹表
+notes:index    —— 笔记轻量索引（列表/搜索用，不含正文）
+note:{id}      —— 单条笔记全文（Tiptap HTML）
 ```
 
-Extension permissions (`wxt.config.ts` / manifest):
+扩展权限（`wxt.config.ts` / manifest）：
 
-| Permission | Purpose |
+| 权限 | 用途 |
 | --- | --- |
-| `storage` | Note data persistence |
-| `unlimitedStorage` | Remove the 10MB default quota of `storage.local` |
-| `downloads` | Export notes as `.md` files (Save As dialog) |
-| `sidePanel` | Side panel UI |
+| `storage` | 笔记数据持久化 |
+| `unlimitedStorage` | 解除 `storage.local` 10MB 默认配额 |
+| `downloads` | 导出笔记为 `.md` 文件（另存为对话框） |
+| `sidePanel` | 侧边栏界面 |
 
-> Uninstalling the extension clears all data; `chrome.storage` is plaintext — do not store passwords/keys or other sensitive data.
+> 卸载扩展会清除全部数据；`chrome.storage` 为明文存储，请勿存放密码/密钥等敏感信息。
 
-## 🏗 Architecture Overview
+## 🏗 架构速览
 
 ```
-sidepanel (Vue UI) ──direct calls──▶ services/* (stateless pure functions + Promise)
-                                        │
-                            chrome.storage.local (only persistence layer)
+sidepanel (Vue UI) ──直接调用──▶ services/*（无状态纯函数 + Promise）
+                                    │
+                        chrome.storage.local（唯一持久层）
 ```
 
-- **Frontend**: `App.vue` is the single state container; leaf components communicate only via Props/Emits, easy to test and swap
-- **Service layer**: decoupled from UI, reusable by sidepanel / background / future content scripts (message-routing protocol ready, see backend-design.md)
-- **Storage**: index and body separated, per-note atomic writes, debounced autosave batching — avoids storage write-rate limits
-- **Theme**: all colors come from CSS variables in `tokens.css`; flipping `<html data-theme>` switches the whole UI (including the editor) instantly
+- **前端**：`App.vue` 是唯一状态容器，叶子组件只通过 Props/Emits 交互，便于测试与替换
+- **服务层**：与 UI 解耦，可被 sidepanel / background / 未来 content script 复用（消息路由协议已备好，见 backend-design.md）
+- **存储**：索引与正文分离、单条笔记独立 key 原子写、自动保存防抖合并——规避 storage 写入频率限制
+- **主题**：全站颜色走 `tokens.css` 的 CSS 变量，`<html data-theme>` 一改全局（含编辑器）即时切换
 
-## 🛠 Dev Commands
+## 🛠 开发命令
 
-| Command | Description |
+| 命令 | 说明 |
 | --- | --- |
-| `npm run dev` | Dev mode (Chrome), extension auto-loaded |
-| `npm run dev:firefox` | Dev mode (Firefox) |
-| `npm run build` | Production build (`.output/chrome-mv3`) |
-| `npm run build:firefox` | Production build (Firefox) |
-| `npm run compile` | `vue-tsc --noEmit` type check |
-| `npm run zip` | Package zip |
-| `npm run zip:firefox` | Package zip (Firefox) |
+| `npm run dev` | 开发模式（Chrome），自动加载扩展 |
+| `npm run dev:firefox` | 开发模式（Firefox） |
+| `npm run build` | 生产构建（`.output/chrome-mv3`） |
+| `npm run build:firefox` | 生产构建（Firefox） |
+| `npm run compile` | `vue-tsc --noEmit` 类型检查 |
+| `npm run zip` | 打包 zip |
+| `npm run zip:firefox` | 打包 zip（Firefox） |
 
-## 📚 Documentation
+## 📚 相关文档
 
-> The docs under `docs/` are currently written in Chinese.
+- [前端接口文档](./docs/frontend-api.md) —— 组件 Props/Emits、类型定义、页面状态流
+- [后端设计方案](./docs/backend-design.md) —— 服务层 API、存储 Schema、消息协议、自动保存策略
+- [设计自评与风险清单](./docs/backend-design-review.md) —— 已知边界与上线前验证清单
 
-- [Frontend API](./docs/frontend-api.md) — component Props/Emits, types, page state flow
-- [Backend Design](./docs/backend-design.md) — service APIs, storage schema, message protocol, autosave strategy
-- [Design Review & Risks](./docs/backend-design-review.md) — known edge cases and pre-release checklist
+## 🛠 自定义
 
-## 🛠 Customization
+- **扩展名称 / 描述**：修改 `wxt.config.ts` 中 `manifest.name` / `manifest.description`（当前为模板占位 `wxt-tiptap` / `nothing`）
+- **内容脚本匹配范围**：`entrypoints/content.ts` 中的 `matches`（当前仅占位匹配 `*://*.google.com/*`）
+- **设计令牌**：在 `styles/tokens.css` 中调整亮/暗两套 CSS 变量即可全局换肤
 
-- **Extension name / description**: edit `manifest.name` / `manifest.description` in `wxt.config.ts` (currently template placeholders `wxt-tiptap` / `nothing`)
-- **Content script match scope**: `matches` in `entrypoints/content.ts` (currently a placeholder matching `*://*.google.com/*`)
-- **Design tokens**: adjust the light/dark CSS variables in `styles/tokens.css` to re-skin the whole app
+## ⚠️ 已知限制
 
-## ⚠️ Known Limitations
-
-- Full-text search scan has a candidate cap (200 notes); notes beyond that may be missed
-- Editor undo/redo is session-scoped (reopening a note after autosave can't undo to before the previous session)
-- No recycle bin / recovery; destructive actions always require confirmation
+- 搜索的正文扫描有候选上限（200 条），超量笔记可能漏命中
+- 编辑器撤销/重做为会话级（自动保存后重开无法撤销到上次会话前）
+- 无删除恢复（回收站），删除操作均带二次确认
 
 ## 📄 License
 
-Private project (`"private": true` in `package.json`) — for personal / internal team use.
+MIT
