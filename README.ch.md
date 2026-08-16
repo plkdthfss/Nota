@@ -26,43 +26,6 @@
 | 存储 | `chrome.storage.local`（无本地数据库） |
 | 状态管理 | 目前收敛在 `App.vue` 单一容器（Pinia 已安装，预留） |
 
-## 📁 目录结构
-
-```
-├── entrypoints/               # WXT 扩展入口
-│   ├── background.ts          # 侧边栏行为配置（点击图标打开）
-│   ├── content.ts             # 内容脚本（占位，匹配 google.com）
-│   └── sidepanel/             # 侧边栏 UI（Vue 应用）
-│       ├── main.ts            # 应用挂载
-│       └── App.vue            # 唯一状态容器（library ↔ editor 页面流）
-├── components/
-│   ├── library/               # 笔记库组件（头部/搜索/文件夹/列表/新建）
-│   ├── editor/                # 编辑器组件（工具栏/气泡菜单/链接弹层/状态栏）
-│   └── common/                # IconButton 等通用组件
-├── composables/
-│   └── useTiptapEditor.ts     # 编辑器实例 + 字数统计
-├── services/                  # 数据服务层（直接读写 chrome.storage.local）
-│   ├── storage.ts             # 存储适配层（防抖写/批量读/错误归一）
-│   ├── noteService.ts         # 笔记 CRUD / 索引维护 / 幂等初始化
-│   ├── folderService.ts       # 文件夹 CRUD / 删除级联
-│   ├── searchService.ts       # 标题/摘要 + 正文批量扫描搜索
-│   ├── settingsService.ts     # 设置（默认文件夹 / 主题）
-│   └── markdownService.ts     # Tiptap HTML ↔ Markdown 转换
-├── types/                     # 领域类型 + 存储模型 + 消息协议
-│   ├── library.ts             # 前端视图类型（Folder / NoteListItem）
-│   ├── editor.ts              # 编辑器类型（SidePanelPage 等）
-│   └── storage.ts             # 持久化模型（Meta / Folder / Note 索引）
-├── styles/                    # 设计令牌 + 全局样式（token 驱动明暗主题）
-│   ├── tokens.css             # 设计令牌（亮/暗两套 CSS 变量）
-│   ├── base.css / library.css / editor.css
-├── mock/                      # 早期 UI 原型期的 mock 数据（已弃用，可删除）
-├── docs/                      # 设计与接口文档
-│   ├── frontend-api.md        # 前端接口文档（组件 Props/Emits）
-│   ├── backend-design.md      # 后端（数据服务层）设计方案
-│   └── backend-design-review.md  # 设计自评与风险清单
-└── wxt.config.ts              # WXT 配置（manifest / 权限）
-```
-
 ## 🚀 快速开始
 
 要求：Node.js 18+，Chrome 浏览器（推荐 114+）。
@@ -150,24 +113,5 @@ sidepanel (Vue UI) ──直接调用──▶ services/*（无状态纯函数 +
 | `npm run zip` | 打包 zip |
 | `npm run zip:firefox` | 打包 zip（Firefox） |
 
-## 📚 相关文档
 
-- [前端接口文档](./docs/frontend-api.md) —— 组件 Props/Emits、类型定义、页面状态流
-- [后端设计方案](./docs/backend-design.md) —— 服务层 API、存储 Schema、消息协议、自动保存策略
-- [设计自评与风险清单](./docs/backend-design-review.md) —— 已知边界与上线前验证清单
 
-## 🛠 自定义
-
-- **扩展名称 / 描述**：修改 `wxt.config.ts` 中 `manifest.name` / `manifest.description`（当前为模板占位 `wxt-tiptap` / `nothing`）
-- **内容脚本匹配范围**：`entrypoints/content.ts` 中的 `matches`（当前仅占位匹配 `*://*.google.com/*`）
-- **设计令牌**：在 `styles/tokens.css` 中调整亮/暗两套 CSS 变量即可全局换肤
-
-## ⚠️ 已知限制
-
-- 搜索的正文扫描有候选上限（200 条），超量笔记可能漏命中
-- 编辑器撤销/重做为会话级（自动保存后重开无法撤销到上次会话前）
-- 无删除恢复（回收站），删除操作均带二次确认
-
-## 📄 License
-
-MIT

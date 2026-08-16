@@ -26,43 +26,6 @@ A note-taking extension for the Chrome **Side Panel**, built with **WXT + Vue 3 
 | Storage | `chrome.storage.local` (no local database) |
 | State management | Centralized in the `App.vue` container (Pinia installed, reserved for future) |
 
-## 📁 Project Structure
-
-```
-├── entrypoints/               # WXT extension entries
-│   ├── background.ts          # Side panel behavior (open on icon click)
-│   ├── content.ts             # Content script (placeholder, matches google.com)
-│   └── sidepanel/             # Side panel UI (Vue app)
-│       ├── main.ts            # App mounting
-│       └── App.vue            # Single state container (library ↔ editor flow)
-├── components/
-│   ├── library/               # Library components (header/search/folders/list/create)
-│   ├── editor/                # Editor components (toolbars/bubble menu/link popover/status bar)
-│   └── common/                # Shared components (IconButton, etc.)
-├── composables/
-│   └── useTiptapEditor.ts     # Editor instance + word count
-├── services/                  # Data service layer (reads/writes chrome.storage.local)
-│   ├── storage.ts             # Storage adapter (debounced writes/batch reads/error mapping)
-│   ├── noteService.ts         # Note CRUD / index maintenance / idempotent init
-│   ├── folderService.ts       # Folder CRUD / delete cascade
-│   ├── searchService.ts       # Title/excerpt + batched full-text scan
-│   ├── settingsService.ts     # Settings (default folder / theme)
-│   └── markdownService.ts     # Tiptap HTML ↔ Markdown conversion
-├── types/                     # Domain types + storage models + message protocol
-│   ├── library.ts             # Frontend view types (Folder / NoteListItem)
-│   ├── editor.ts              # Editor types (SidePanelPage, etc.)
-│   └── storage.ts             # Persistence models (Meta / Folder / Note index)
-├── styles/                    # Design tokens + global styles (token-driven themes)
-│   ├── tokens.css             # Design tokens (light/dark CSS variables)
-│   ├── base.css / library.css / editor.css
-├── mock/                      # Mock data from the early UI prototype (deprecated, removable)
-├── docs/                      # Design & API documentation (in Chinese)
-│   ├── frontend-api.md        # Frontend API docs (component Props/Emits)
-│   ├── backend-design.md      # Backend (data service layer) design
-│   └── backend-design-review.md  # Design self-review & risk list
-└── wxt.config.ts              # WXT config (manifest / permissions)
-```
-
 ## 🚀 Quick Start
 
 Requirements: Node.js 18+, Chrome browser (114+ recommended).
@@ -150,26 +113,4 @@ sidepanel (Vue UI) ──direct calls──▶ services/* (stateless pure functi
 | `npm run zip` | Package zip |
 | `npm run zip:firefox` | Package zip (Firefox) |
 
-## 📚 Documentation
 
-> The docs under `docs/` are currently written in Chinese.
-
-- [Frontend API](./docs/frontend-api.md) — component Props/Emits, types, page state flow
-- [Backend Design](./docs/backend-design.md) — service APIs, storage schema, message protocol, autosave strategy
-- [Design Review & Risks](./docs/backend-design-review.md) — known edge cases and pre-release checklist
-
-## 🛠 Customization
-
-- **Extension name / description**: edit `manifest.name` / `manifest.description` in `wxt.config.ts` (currently template placeholders `wxt-tiptap` / `nothing`)
-- **Content script match scope**: `matches` in `entrypoints/content.ts` (currently a placeholder matching `*://*.google.com/*`)
-- **Design tokens**: adjust the light/dark CSS variables in `styles/tokens.css` to re-skin the whole app
-
-## ⚠️ Known Limitations
-
-- Full-text search scan has a candidate cap (200 notes); notes beyond that may be missed
-- Editor undo/redo is session-scoped (reopening a note after autosave can't undo to before the previous session)
-- No recycle bin / recovery; destructive actions always require confirmation
-
-## 📄 License
-
-Private project (`"private": true` in `package.json`) — for personal / internal team use.
