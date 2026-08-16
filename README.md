@@ -1,4 +1,4 @@
-# SideNote — Chrome Side Panel Notes Extension
+# Nota — Chrome Side Panel Notes Extension
 
 <p align="center">
   <a href="./README.ch.md">简体中文</a> | <b>English</b>
@@ -45,7 +45,7 @@ npm run build
 
 1. Open `chrome://extensions` and enable "Developer mode" (top-right)
 2. Click "Load unpacked" and select `项目目录/.output/chrome-mv3`
-3. Click the extension icon in the toolbar to open the SideNote side panel
+3. Click the extension icon in the toolbar to open the Nota side panel
 
 **Package for publishing**:
 

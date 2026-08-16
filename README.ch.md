@@ -1,4 +1,4 @@
-# SideNote — Chrome 侧边栏笔记插件
+# Nota — Chrome 侧边栏笔记插件
 
 <p align="center">
   <a href="./README.md">English</a> | <b>简体中文</b>
@@ -45,7 +45,7 @@ npm run build
 
 1. 打开 `chrome://extensions`，开启右上角「开发者模式」
 2. 点击「加载已解压的扩展程序」，选择 `项目目录/.output/chrome-mv3`
-3. 点击工具栏中的扩展图标，侧边栏即打开 SideNote
+3. 点击工具栏中的扩展图标，侧边栏即打开 Nota
 
 **打包发布**：
 
