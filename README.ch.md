@@ -88,19 +88,6 @@ note:{id}      —— 单条笔记全文（Tiptap HTML）
 
 > 卸载扩展会清除全部数据；`chrome.storage` 为明文存储，请勿存放密码/密钥等敏感信息。
 
-## 🏗 架构速览
-
-```
-sidepanel (Vue UI) ──直接调用──▶ services/*（无状态纯函数 + Promise）
-                                    │
-                        chrome.storage.local（唯一持久层）
-```
-
-- **前端**：`App.vue` 是唯一状态容器，叶子组件只通过 Props/Emits 交互，便于测试与替换
-- **服务层**：与 UI 解耦，可被 sidepanel / background / 未来 content script 复用（消息路由协议已备好，见 backend-design.md）
-- **存储**：索引与正文分离、单条笔记独立 key 原子写、自动保存防抖合并——规避 storage 写入频率限制
-- **主题**：全站颜色走 `tokens.css` 的 CSS 变量，`<html data-theme>` 一改全局（含编辑器）即时切换
-
 ## 🛠 开发命令
 
 | 命令 | 说明 |

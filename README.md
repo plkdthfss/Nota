@@ -88,19 +88,6 @@ Extension permissions (`wxt.config.ts` / manifest):
 
 > Uninstalling the extension clears all data; `chrome.storage` is plaintext — do not store passwords/keys or other sensitive data.
 
-## 🏗 Architecture Overview
-
-```
-sidepanel (Vue UI) ──direct calls──▶ services/* (stateless pure functions + Promise)
-                                        │
-                            chrome.storage.local (only persistence layer)
-```
-
-- **Frontend**: `App.vue` is the single state container; leaf components communicate only via Props/Emits, easy to test and swap
-- **Service layer**: decoupled from UI, reusable by sidepanel / background / future content scripts (message-routing protocol ready, see backend-design.md)
-- **Storage**: index and body separated, per-note atomic writes, debounced autosave batching — avoids storage write-rate limits
-- **Theme**: all colors come from CSS variables in `tokens.css`; flipping `<html data-theme>` switches the whole UI (including the editor) instantly
-
 ## 🛠 Dev Commands
 
 | Command | Description |
