@@ -164,7 +164,7 @@ export function onChanged(cb: (changes: Record<string, chrome.storage.StorageCha
 export async function listFolders(): Promise<FolderRecord[]>;
 export async function createFolder(name: string): Promise<FolderRecord>;
 export async function renameFolder(id: string, name: string): Promise<FolderRecord>;
-export async function deleteFolder(id: string, options: { moveNotesTo: 'inbox' | 'delete' }): Promise<void>; // 级联策略见 §5.5
+export async function deleteFolder(id: string, options: { moveNotesTo: 'delete' | string }): Promise<void>; // 'delete' 连笔记删除；string 为目标文件夹 id（'inbox' 为默认文件夹别名），级联策略见 §5.5
 ```
 
 ### 3.3 `services/noteService.ts`（核心）
@@ -221,12 +221,14 @@ export async function markdownToHtml(md: string): Promise<string>;
 
 用已安装的 `@tiptap/markdown`（TiptapMarkdown）。约定：**正文以 Tiptap HTML 持久化**（编辑器原生格式，避免每键击转换的性能损耗）；HTML↔MD 转换只发生在导入/导出/剪藏边界。
 
-### 3.6 `services/settingsService.ts`（预留）
+### 3.6 `services/settingsService.ts`
 
 ```ts
-export async function getSettings(): Promise<MetaRecord['settings']>; // { defaultFolderId }
+export async function getSettings(): Promise<MetaRecord['settings']>; // { defaultFolderId, theme: 'light' | 'dark' }
 export async function setSettings(patch: Partial<MetaRecord['settings']>): Promise<void>;
 ```
+
+> `settings` 现包含 `defaultFolderId` 与 `theme`（界面主题，由 AppHeader More 菜单切换，App.vue 应用到 `<html data-theme>`）。新增字段给默认值即可平滑升级，无需迁移（旧数据缺 `theme` 时 `getSettings` 回退为 `'light'`）。
 
 ---
 
@@ -240,7 +242,7 @@ type ServiceRequest =
   | { type: 'folders:list' }
   | { type: 'folders:create'; payload: { name: string } }
   | { type: 'folders:rename'; payload: { id: string; name: string } }
-  | { type: 'folders:delete'; payload: { id: string; moveNotesTo: 'inbox' | 'delete' } }
+  | { type: 'folders:delete'; payload: { id: string; moveNotesTo: 'delete' | string } }
   | { type: 'notes:list'; payload?: { folderId?: string; query?: string } }
   | { type: 'notes:get'; payload: { id: string } }
   | { type: 'notes:create'; payload?: { title?: string; folderId?: string } }
@@ -313,9 +315,11 @@ visibilitychange / pagehide（侧边栏关闭前）→ 强制 flush 未落盘变
 
 `deleteFolder(id, { moveNotesTo })`：
 
-- `'inbox'`（推荐）：该文件夹下笔记的 `folderId` 改为默认文件夹——误删可恢复；
+- **目标文件夹 id**（推荐）：该文件夹下笔记的 `folderId` 改为指定文件夹——误删可恢复，目标由 UI 从现有文件夹中选择；
 - `'delete'`：连同笔记一起 `removeItems`；
-- UI 侧加确认弹窗（现有 `NewNoteButton` / `FolderItem` 接口不变，交互由 App.vue 组合）。
+- `'inbox'`：向后兼容别名，等价于默认文件夹（`settings.defaultFolderId`）；
+- 校验：目标必须存在（`NOT_FOUND`）、不能是被删除文件夹自身（`VALIDATION`）；默认文件夹不可删除。
+- UI 侧：`FolderItem` 删除确认态内置"Move notes to"目标文件夹下拉（`moveTargets` prop 排除自身），交互由 App.vue 组合。
 
 ### 5.6 数据迁移
 

@@ -33,8 +33,11 @@ button {
     color: inherit;
 }
 
-button:focus-visible,
-input:focus-visible {
+/* 输入框的聚焦指示由各自的容器/组件样式提供
+   （如 .search-box:focus-within、.editor-title-input:focus-visible、
+   .link-popover input:focus、.fab-menu-input:focus），
+   因此这里只保留按钮的全局 outline，避免与输入框自带的聚焦样式叠加成粗边框 */
+button:focus-visible {
     outline: 2px solid var(--color-action-accent);
     outline-offset: 2px;
 }
@@ -49,7 +52,7 @@ button {
 
 ::-webkit-scrollbar-thumb {
     border-radius: 99px;
-    background: #d4d4d8;
+    background: var(--color-scrollbar-thumb);
 }
 
 ::-webkit-scrollbar-track {

@@ -1,18 +1,25 @@
 <script setup lang="ts">
-import { MoreHorizontal, Search } from "@lucide/vue";
+import { Moon, Sun } from "@lucide/vue";
 import IconButton from "../common/IconButton.vue";
-defineEmits<{ search: [] }>();
+
+const props = defineProps<{ theme: "light" | "dark" }>();
+const emit = defineEmits<{ toggleTheme: [] }>();
+
+const targetLabel = props.theme === "dark" ? "Switch to light mode" : "Switch to dark mode";
 </script>
 <template>
   <header class="app-header">
     <span class="app-mark" aria-hidden="true" />
     <h1 class="app-title">SideNote</h1>
     <div class="header-actions">
-      <IconButton label="Search notes" @click="$emit('search')"
-        ><Search :size="16" /></IconButton
-      ><IconButton label="More options"
-        ><MoreHorizontal :size="16"
-      /></IconButton>
+      <IconButton
+        :label="targetLabel"
+        :title="targetLabel"
+        @click="$emit('toggleTheme')"
+      >
+        <Sun v-if="theme === 'dark'" :size="16" aria-hidden="true" />
+        <Moon v-else :size="16" aria-hidden="true" />
+      </IconButton>
     </div>
   </header>
 </template>

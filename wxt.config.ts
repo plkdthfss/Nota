@@ -8,6 +8,6 @@ export default defineConfig({
     name: 'wxt-tiptap',
     description: 'nothing',
 
-    permissions: ['storage'],
+    permissions: ['storage', 'unlimitedStorage', 'downloads'],
   }
 });

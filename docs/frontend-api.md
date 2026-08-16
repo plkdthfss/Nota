@@ -135,13 +135,19 @@ const { editor, wordCount } = useTiptapEditor('<p>Hello</p>');
 
 ### 5.1 `AppHeader` — 顶部标题栏
 
+**Props**
+
+| 名称 | 类型 | 说明 |
+| --- | --- | --- |
+| `theme` | `'light' \| 'dark'` | 当前主题；决定切换按钮显示的图标（亮色显示月亮 → 切暗色；暗色显示太阳 → 切亮色） |
+
 **Emits**
 
 | 事件 | 参数 | 说明 |
 | --- | --- | --- |
-| `search` | — | 点击搜索按钮，父组件据此触发搜索框聚焦 |
+| `toggleTheme` | — | 点击主题切换按钮；父组件翻转主题并应用到 `<html data-theme>`、持久化到 `settings.theme` |
 
-无 Props。内含品牌标识、标题 "SideNote"、搜索与更多按钮。
+> 无下拉菜单。右侧仅一个主题切换图标按钮（亮/暗互切）。
 
 ### 5.2 `SearchBar` — 搜索框（受控组件）
 
@@ -172,12 +178,16 @@ const { editor, wordCount } = useTiptapEditor('<p>Hello</p>');
 | 名称 | 类型 | 说明 |
 | --- | --- | --- |
 | `folders` | `Folder[]` | 文件夹列表（选中状态由父组件计算注入） |
+| `defaultFolderId` | `string`（可选） | 默认文件夹 id；对应文件夹不渲染删除入口（透传给 `FolderItem.deletable`） |
 
 **Emits**
 
 | 事件 | 参数 | 说明 |
 | --- | --- | --- |
 | `select` | `id: string` | 点击某个文件夹，透传 `FolderItem` 的 `select` |
+| `deleteFolder` | `id: string, moveNotesTo: 'delete' \| string` | 删除文件夹，透传 `FolderItem` 的 `deleteFolder`（`moveNotesTo` 决定级联策略） |
+
+> 每个 `FolderItem` 会收到 `moveTargets`（除自身外的全部文件夹，供删除确认态选择移入目标）。
 
 ### 5.4 `FolderItem` — 单行文件夹
 
@@ -186,12 +196,17 @@ const { editor, wordCount } = useTiptapEditor('<p>Hello</p>');
 | 名称 | 类型 | 说明 |
 | --- | --- | --- |
 | `folder` | `Folder` | 文件夹节点；`selected` 控制高亮，`expanded` 控制箭头方向 |
+| `deletable` | `boolean`（可选，默认 `true`） | 为 `false` 时不渲染选项菜单按钮（默认文件夹无删除入口） |
+| `moveTargets` | `{ id: string; name: string }[]`（可选，默认 `[]`） | 删除确认态中可移入的目标文件夹列表（由 `FolderTree` 计算，排除自身） |
 
 **Emits**
 
 | 事件 | 参数 | 说明 |
 | --- | --- | --- |
 | `select` | `id: string` | 点击整行触发（`folder.id`） |
+| `deleteFolder` | `id: string, moveNotesTo: 'delete' \| string` | 删除文件夹；`moveNotesTo: 'delete'` 连同笔记删除，否则为目标文件夹 id（笔记移入该文件夹） |
+
+> 行右侧 MoreHorizontal 选项按钮（`@click.stop`，不触发 `select`）弹出菜单：**Delete folder** → 若该文件夹无笔记（`folder.count === 0`）**直接删除**不弹确认；否则切换为确认态（**Move notes to** 下拉选择目标文件夹 + **Move** 主色 / **Delete notes** 危险色 / X 取消）；Esc 或点击外部关闭弹层。目标下拉默认选中第一个可移入文件夹，未选中时 **Move** 禁用。
 
 ### 5.5 `NoteList` — 笔记列表容器
 
@@ -206,6 +221,8 @@ const { editor, wordCount } = useTiptapEditor('<p>Hello</p>');
 | 事件 | 参数 | 说明 |
 | --- | --- | --- |
 | `select` | `id: string` | 透传 `NoteListItem` 的 `select` |
+| `delete` | `id: string` | 透传 `NoteListItem` 的 `delete` |
+| `exportMd` | `id: string` | 透传 `NoteListItem` 的 `exportMd` |
 
 ### 5.6 `NoteListItem` — 单张笔记卡片
 
@@ -220,8 +237,10 @@ const { editor, wordCount } = useTiptapEditor('<p>Hello</p>');
 | 事件 | 参数 | 说明 |
 | --- | --- | --- |
 | `select` | `id: string` | 点击卡片 / Enter / Space 触发 |
+| `delete` | `id: string` | Note options 菜单 → 内联确认 → 删除（`note.id`） |
+| `exportMd` | `id: string` | Note options 菜单 → **Export markdown**（`note.id`），父组件导出 `.md` 文件 |
 
-> 卡片右上角“更多”按钮 `@click.stop`，当前不 emit。
+> 卡片右上角 MoreHorizontal 选项按钮（`@click.stop`，不触发卡片 `select`）弹出菜单：**Delete**（危险色）→ 切换为内联确认（**Delete note?** + 危险色 Delete / X 取消）；**Export markdown**（Download 图标）→ 直接触发导出；Esc 或点击外部关闭弹层。
 
 ### 5.7 `SearchResultHeader` — 搜索结果统计
 
@@ -233,13 +252,16 @@ const { editor, wordCount } = useTiptapEditor('<p>Hello</p>');
 
 无 Emits。
 
-### 5.8 `NewNoteButton` — 新建笔记悬浮按钮
+### 5.8 `NewNoteButton` — 新建悬浮按钮（FAB + 上拉菜单）
+
+点击 FAB 向上弹出创建菜单：**New note**（在当前选中文件夹新建笔记）或 **New folder**（内联输入文件夹名确认，Esc/外部点击关闭，确认按钮在名称为空时禁用）。
 
 **Emits**
 
 | 事件 | 参数 | 说明 |
 | --- | --- | --- |
-| `create` | — | 点击 FAB 按钮（当前 App.vue 未绑定处理） |
+| `create` | — | 选择 "New note"，在当前选中文件夹新建笔记 |
+| `createFolder` | `name: string` | 选择 "New folder" 并确认名称后触发 |
 
 无 Props。
 
