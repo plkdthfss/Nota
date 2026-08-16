@@ -5,7 +5,7 @@ export default defineConfig({
   modules: ['@wxt-dev/module-vue'],
 
   manifest: {
-    name: 'wxt-tiptap',
+    name: 'Nota',
     description: 'nothing',
 
     permissions: ['storage', 'unlimitedStorage', 'downloads'],
